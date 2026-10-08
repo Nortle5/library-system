@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+requireLogin();
+
 $books = require __DIR__ . '/includes/sample_books.php';
 
 $id = (int) ($_GET['id'] ?? 0);

@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+requireAdmin();
+
 $pageTitle = 'Manage Books';
 $area = 'admin';
 

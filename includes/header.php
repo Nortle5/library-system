@@ -21,7 +21,7 @@ $pageTitle = $pageTitle ?? 'Library System';
                     <a href="books.php" class="text-gray-600 hover:text-blue-600">Books</a>
                     <a href="profile.php" class="text-gray-600 hover:text-blue-600">My Profile</a>
                 <?php endif; ?>
-                <a href="login.php" class="text-gray-600 hover:text-blue-600">Log out</a>
+                    <a href="logout.php" class="text-gray-600 hover:text-blue-600">Log out</a>
             </div>
     </nav>
 </header>
