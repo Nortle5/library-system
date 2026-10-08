@@ -12,12 +12,17 @@ $pageTitle = $pageTitle ?? 'Library System';
 <body class="min-h-screen bg-gray-100">
 <header class="bg-white shadow">
     <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <a href="books.php" class="text-lg font-semibold text-gray-800">Library System</a>
-        <div class="flex items-center gap-4 text-sm">
-            <a href="books.php" class="text-gray-600 hover:text-blue-600">Books</a>
-            <a href="profile.php" class="text-gray-600 hover:text-blue-600">My Profile</a>
-            <a href="login.php" class="text-gray-600 hover:text-blue-600">Log out</a>
-        </div>
+        <a href="<?= ($area ?? 'student') === 'admin' ? 'admin-books.php' : 'books.php' ?>" class="text-lg font-semibold text-gray-800">Library System</a>
+            <div class="flex items-center gap-4 text-sm">
+                <?php if (($area ?? 'student') === 'admin'): ?>
+                    <a href="admin-books.php" class="text-gray-600 hover:text-blue-600">Manage Books</a>
+                    <a href="admin-borrowings.php" class="text-gray-600 hover:text-blue-600">Borrowings</a>
+                <?php else: ?>
+                    <a href="books.php" class="text-gray-600 hover:text-blue-600">Books</a>
+                    <a href="profile.php" class="text-gray-600 hover:text-blue-600">My Profile</a>
+                <?php endif; ?>
+                <a href="login.php" class="text-gray-600 hover:text-blue-600">Log out</a>
+            </div>
     </nav>
 </header>
 <main class="mx-auto max-w-5xl px-4 py-8">
