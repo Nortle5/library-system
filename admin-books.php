@@ -1,15 +1,82 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 requireAdmin();
+require_once __DIR__ . '/includes/db.php';
 
 $pageTitle = 'Manage Books';
 $area = 'admin';
 
-$books = require __DIR__ . '/includes/sample_books.php';
+$errors = [];
+$booksCol = getDb()->selectCollection('books');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && ($_POST['id'] ?? '') === '') {
+    $title  = trim($_POST['title']);
+    $author = trim($_POST['author'] ?? '');
+    $genre  = trim($_POST['genre'] ?? '');
+    $copies = trim($_POST['totalCopies'] ?? '');
+
+    if ($title === '' || mb_strlen($title) > 150) {
+        $errors[] = 'Title is required (up to 150 characters).';
+    }
+    if ($author === '' || mb_strlen($author) > 100) {
+        $errors[] = 'Author is required (up to 100 characters).';
+    }
+    if ($genre === '' || mb_strlen($genre) > 50) {
+        $errors[] = 'Genre is required (up to 50 characters).';
+    }
+    if (filter_var($copies, FILTER_VALIDATE_INT) === false || $copies < 1 || $copies > 1000) {
+        $errors[] = 'Total copies must be a whole number from 1 to 1000.';
+    }
+
+    if (empty($errors)) {
+        $booksCol->insertOne([
+            'title'           => $title,
+            'author'          => $author,
+            'genre'           => $genre,
+            'totalCopies'     => (int) $copies,
+            'availableCopies' => (int) $copies,
+            'createdAt'       => new MongoDB\BSON\UTCDateTime(),
+        ]);
+        header('Location: admin-books.php?added=1');
+        exit;
+    }
+}
+
+$books = [];
+foreach ($booksCol->find([], ['sort' => ['title' => 1]]) as $doc) {
+    $books[] = [
+        'id'        => (string) $doc['_id'],
+        'title'     => $doc['title'],
+        'author'    => $doc['author'],
+        'genre'     => $doc['genre'],
+        'total'     => $doc['totalCopies'],
+        'available' => $doc['availableCopies'],
+    ];
+}
+
+$borrowers = [];
+$usersCol = getDb()->selectCollection('users');
+foreach (getDb()->selectCollection('borrowings')->find(['status' => 'borrowed']) as $b) {
+    $u = $usersCol->findOne(['_id' => $b['userId']]);
+    $name = $u ? $u['firstName'] . ' ' . $u['lastName'] : 'Unknown student';
+    $borrowers[(string) $b['bookId']][] = $name;
+}
 
 include __DIR__ . '/includes/header.php';
 ?>
 
+<?php if (isset($_GET['added'])): ?>
+    <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">Book added.</div>
+<?php endif; ?>
+<?php if (!empty($errors)): ?>
+    <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+        <ul class="list-disc pl-5">
+            <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-semibold text-gray-800">Manage Books</h1>
 
@@ -26,6 +93,7 @@ include __DIR__ . '/includes/header.php';
                 <th class="px-4 py-3">Author</th>
                 <th class="px-4 py-3">Genre</th>
                 <th class="px-4 py-3">Available</th>
+                <th class="px-4 py-3">Borrowed by</th>
                 <th class="px-4 py-3 text-right">Actions</th>
             </tr>
         </thead>
@@ -36,11 +104,19 @@ include __DIR__ . '/includes/header.php';
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($book['author']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($book['genre']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= $book['available'] ?> of <?= $book['total'] ?></td>
+                    <td class="px-4 py-3 text-gray-600">
+                        <?php if (empty($borrowers[$book['id']])): ?>
+                            —
+                        <?php else: ?>
+                            <?php foreach ($borrowers[$book['id']] as $borrowerName): ?>
+                                <div><?= htmlspecialchars($borrowerName) ?></div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </td>
                     <td class="px-4 py-3 text-right">
                     
                         <button type="button"
-                                class="edit-book-btn mr-3 text-blue-600 hover:underline"
-                                data-id="<?= (int) $book['id'] ?>"
+                                class="edit-book-btn mr-3 text-blue-600 hover:underline" data-id="<?= htmlspecialchars($book['id']) ?>"
                                 data-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
                                 data-author="<?= htmlspecialchars($book['author'], ENT_QUOTES) ?>"
                                 data-genre="<?= htmlspecialchars($book['genre'], ENT_QUOTES) ?>"
@@ -49,7 +125,7 @@ include __DIR__ . '/includes/header.php';
                         </button>
 
                         <form method="post" action="admin-books.php" class="inline">
-                            <input type="hidden" name="id" value="<?= $book['id'] ?>">
+                            <input type="hidden" name="id" value="<?= htmlspecialchars($book['id']) ?>">
                             <button type="submit" class="text-red-600 hover:underline">Delete</button>
                         </form>
                     </td>
