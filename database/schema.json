@@ -1,0 +1,51 @@
+{
+  "database": "library",
+  "engine": "MongoDB (Atlas)",
+  "collections": {
+    "users": {
+      "description": "Students and the single admin account.",
+      "fields": {
+        "_id": "ObjectId (auto)",
+        "firstName": "string, letters only, up to 50 characters",
+        "lastName": "string, letters only, up to 50 characters",
+        "studentId": "string, 4 to 20 letters, numbers, or dashes (students only)",
+        "age": "int, 15 to 100 (students only)",
+        "course": "string, one of the allowed courses (students only)",
+        "yearLevel": "int, 1 to 4 (students only)",
+        "username": "string, 4 to 20 letters, numbers, or underscores",
+        "passwordHash": "string, bcrypt hash from password_hash()",
+        "role": "string, 'student' or 'admin'",
+        "createdAt": "date"
+      },
+      "indexes": [
+        { "keys": { "username": 1 }, "unique": true },
+        { "keys": { "studentId": 1 }, "unique": true }
+      ]
+    },
+    "books": {
+      "description": "Books in the library. Borrowed copies = totalCopies - availableCopies.",
+      "fields": {
+        "_id": "ObjectId (auto)",
+        "title": "string, up to 150 characters",
+        "author": "string, up to 100 characters",
+        "genre": "string, up to 50 characters",
+        "totalCopies": "int, 1 to 1000",
+        "availableCopies": "int, 0 to totalCopies",
+        "createdAt": "date"
+      },
+      "indexes": []
+    },
+    "borrowings": {
+      "description": "One record per borrow. Returned books are kept, with status 'returned', as history.",
+      "fields": {
+        "_id": "ObjectId (auto)",
+        "userId": "ObjectId, references users._id",
+        "bookId": "ObjectId, references books._id",
+        "borrowedAt": "date",
+        "returnedAt": "date or null while still borrowed",
+        "status": "string, 'borrowed' or 'returned'"
+      },
+      "indexes": []
+    }
+  }
+}
