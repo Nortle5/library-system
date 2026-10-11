@@ -36,23 +36,23 @@ function renderBookCards(array $books, string $q): void{
     <?php
         return;
     } ?>
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
         <?php foreach ($books as $book): ?>
-            <div class="rounded-lg bg-white p-5 shadow">
-                <h2 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($book['title']) ?></h2>
+            <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <h2 class="break-words text-lg font-semibold text-gray-800"><?= htmlspecialchars($book['title']) ?></h2>
                 <p class="text-sm text-gray-600">by <?= htmlspecialchars($book['author']) ?></p>
                 <p class="mt-2 inline-block rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
                     <?= htmlspecialchars($book['genre']) ?>
                 </p>
 
-                <div class="mt-4 flex items-center justify-between">
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
                     <?php if ($book['available'] > 0): ?>
                         <span class="text-sm text-green-700"><?= $book['available'] ?> of <?= $book['total'] ?> available</span>
                     <?php else: ?>
                         <span class="text-sm text-red-600">All copies borrowed</span>
                     <?php endif; ?>
                     <button type="button"
-                            class="details-btn text-sm font-medium text-blue-600 hover:underline"
+                            class="details-btn text-sm font-medium text-orange-600 hover:underline"
                             data-id="<?= htmlspecialchars($book['id']) ?>"
                             data-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
                             data-author="<?= htmlspecialchars($book['author'], ENT_QUOTES) ?>"

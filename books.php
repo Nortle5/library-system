@@ -31,8 +31,8 @@
 
 <form method="get" action="books.php" class="mb-6 flex gap-2">
     <input type="text" id="search-input" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search by title, author, or genre"
-           class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none">
-    <button type="submit" class="rounded bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700">
+           class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-orange-500 focus:outline-none">
+    <button type="submit" class="rounded bg-orange-500 px-5 py-2 font-medium text-white hover:bg-orange-600">
         Search
     </button>
 </form>
@@ -45,7 +45,7 @@
     <div class="p-6">
         <h2 id="d-title" class="text-xl font-semibold text-gray-800"></h2>
         <p id="d-author" class="mt-1 text-gray-600"></p>
-        <p id="d-genre" class="mt-3 inline-block rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700"></p>
+        <p id="d-genre" class="mt-3 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700"></p>
 
         <dl class="mt-5 grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -63,7 +63,7 @@
             <button type="button" id="d-close" class="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 Close
             </button>
-            <button type="submit" id="d-borrow" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            <button type="submit" id="d-borrow" class="rounded bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600">
                 Borrow this book
             </button>
         </form>
@@ -94,7 +94,7 @@
         borrowBtn.textContent = available < 1 ? 'All copies borrowed' : 'Borrow this book';
         borrowBtn.className = available < 1
             ? 'cursor-not-allowed rounded bg-gray-300 px-4 py-2 text-sm font-medium text-gray-500'
-            : 'rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700';
+            : 'rounded bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600';
 
         detailsDialog.showModal();
     });
