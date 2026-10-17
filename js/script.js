@@ -57,6 +57,7 @@ function initRegisterValidation() {
         }
     });
 }
+
 function initLiveSearch() {
     const input = document.getElementById('search-input');
     const results = document.getElementById('book-results');
@@ -90,5 +91,87 @@ function initLiveSearch() {
         }, 250);
     });
 }
+
+function initMobileMenu() {
+    const button = document.getElementById('menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    if (!button || !menu) return; 
+
+    button.addEventListener('click', () => {
+        const isOpen = menu.classList.toggle('hidden') === false;
+        button.setAttribute('aria-expanded', String(isOpen));
+    });
+}
+
+function initBackToTop() {
+    const button = document.getElementById('back-to-top');
+    if (!button) return; 
+
+    const update = () => {
+        const show = window.scrollY > 300;
+        button.classList.toggle('hidden', !show);
+        button.classList.toggle('flex', show);
+    };
+
+    window.addEventListener('scroll', update, { passive: true });
+    button.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    update();
+}
+
+function initTableSearch() {
+    const input = document.getElementById('table-search');
+    const table = document.getElementById('books-table');
+    if (!input || !table) return;
+
+    const rows = Array.from(table.querySelectorAll('tbody tr[data-row]'));
+    const emptyRow = document.getElementById('no-match');
+
+    input.addEventListener('input', () => {
+        const term = input.value.trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const match = row.dataset.search.includes(term);
+            row.classList.toggle('hidden', !match);
+            if (match) visible++;
+        });
+
+        if (emptyRow) emptyRow.classList.toggle('hidden', visible !== 0);
+    });
+}
+function initBorrowingTabs() {
+    const tabs = document.querySelectorAll('[data-filter]');
+    const rows = document.querySelectorAll('tr[data-status]');
+    const emptyRow = document.getElementById('no-records');
+    if (!tabs.length) return; // not the borrowings page, so skip
+
+    const active = ['bg-orange-500', 'text-white'];
+    const idle = ['bg-gray-100', 'text-gray-700', 'hover:bg-gray-200'];
+
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const filter = tab.dataset.filter;
+            let visible = 0;
+
+            tabs.forEach((t) => {
+                const on = t === tab;
+                t.classList.remove(...active, ...idle);
+                t.classList.add(...(on ? active : idle));
+            });
+
+            rows.forEach((row) => {
+                const show = filter === 'all' || row.dataset.status === filter;
+                row.classList.toggle('hidden', !show);
+                if (show) visible++;
+            });
+
+            if (emptyRow) emptyRow.classList.toggle('hidden', visible !== 0);
+        });
+    });
+}
 initRegisterValidation();
 initLiveSearch();
+initMobileMenu();
+initBackToTop();
+initTableSearch();
+initBorrowingTabs();

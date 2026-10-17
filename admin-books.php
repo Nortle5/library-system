@@ -103,6 +103,10 @@ foreach (getDb()->selectCollection('borrowings')->find(['status' => 'borrowed'])
     $borrowers[(string) $b['bookId']][] = $name;
 }
 
+$titleCount = count($books);
+$copiesTotal = array_sum(array_column($books, 'total'));
+$copiesOut = $copiesTotal - array_sum(array_column($books, 'available'));
+
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -134,33 +138,69 @@ $flash = $resultMessages[$_GET['result'] ?? ''] ?? null;
         </ul>
     </div>
 <?php endif; ?>
-<div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-gray-800">Manage Books</h1>
 
-    <button type="button" id="add-book-btn" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+<div class="mb-6 flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-bold text-gray-800">Manage Books</h1>
+    <button type="button" id="add-book-btn"
+            class="rounded bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600">
         + Add book
     </button>
 </div>
 
-<div class="overflow-x-auto rounded-lg bg-white shadow">
-    <table class="w-full text-left text-sm">
+<!-- Summary -->
+<section class="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-gray-800"><?= $titleCount ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Titles</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-green-600"><?= $copiesTotal - $copiesOut ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Copies on shelf</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-orange-500"><?= $copiesOut ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Copies on loan</p>
+    </div>
+</section>
+
+<!-- Search -->
+<input type="search" id="table-search" placeholder="Search by title, author, or genre"
+       class="mb-4 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-orange-500 focus:outline-none">
+
+<div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <table id="books-table" class="w-full min-w-[44rem] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-gray-600">
             <tr>
                 <th class="px-4 py-3">Title</th>
                 <th class="px-4 py-3">Author</th>
                 <th class="px-4 py-3">Genre</th>
-                <th class="px-4 py-3">Available</th>
+                <th class="px-4 py-3">Copies</th>
                 <th class="px-4 py-3">Borrowed by</th>
                 <th class="px-4 py-3 text-right">Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($books as $book): ?>
-                <tr class="border-b border-gray-200 last:border-0">
-                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($book['title']) ?></td>
+                <?php
+                $tagClass = $book['available'] === 0
+                    ? 'bg-red-50 text-red-700'
+                    : ($book['available'] < $book['total'] ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700');
+                $searchText = mb_strtolower($book['title'] . ' ' . $book['author'] . ' ' . $book['genre']);
+                ?>
+                <tr data-row data-search="<?= htmlspecialchars($searchText, ENT_QUOTES) ?>"
+                    class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-800"><?= htmlspecialchars($book['title']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($book['author']) ?></td>
-                    <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($book['genre']) ?></td>
-                    <td class="px-4 py-3 text-gray-600"><?= $book['available'] ?> of <?= $book['total'] ?></td>
+                    <td class="px-4 py-3">
+                        <span class="whitespace-nowrap rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
+                            <?= htmlspecialchars($book['genre']) ?>
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium <?= $tagClass ?>">
+                            <?= $book['available'] ?> of <?= $book['total'] ?>
+                        </span>
+                    </td>
                     <td class="px-4 py-3 text-gray-600">
                         <?php if (empty($borrowers[$book['id']])): ?>
                             —
@@ -170,59 +210,69 @@ $flash = $resultMessages[$_GET['result'] ?? ''] ?? null;
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3 text-right">
-                    
-                        <button type="button"
-                                class="edit-book-btn mr-3 text-blue-600 hover:underline" data-id="<?= htmlspecialchars($book['id']) ?>"
-                                data-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
-                                data-author="<?= htmlspecialchars($book['author'], ENT_QUOTES) ?>"
-                                data-genre="<?= htmlspecialchars($book['genre'], ENT_QUOTES) ?>"
-                                data-copies="<?= (int) $book['total'] ?>">
-                            Edit
-                        </button>
-
-                        <form method="post" action="delete-book.php" class="inline" onsubmit="return confirm('Delete this book? This cannot be undone.');">
-                            <input type="hidden" name="id" value="<?= htmlspecialchars($book['id']) ?>">
-                            <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                        </form>
+                    <td class="px-4 py-3">
+                        <div class="flex justify-end gap-2">
+                            <button type="button"
+                                    class="edit-book-btn rounded border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                                    data-id="<?= htmlspecialchars($book['id']) ?>"
+                                    data-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
+                                    data-author="<?= htmlspecialchars($book['author'], ENT_QUOTES) ?>"
+                                    data-genre="<?= htmlspecialchars($book['genre'], ENT_QUOTES) ?>"
+                                    data-copies="<?= (int) $book['total'] ?>">
+                                Edit
+                            </button>
+                            <form method="post" action="delete-book.php"
+                                  onsubmit="return confirm('Delete this book? This cannot be undone.');">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($book['id']) ?>">
+                                <button type="submit"
+                                        class="rounded border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
+            <tr id="no-match" class="hidden">
+                <td colspan="6" class="px-4 py-8 text-center text-gray-500">No books match your search.</td>
+            </tr>
         </tbody>
     </table>
 </div>
 
-<dialog id="book-dialog" class="m-auto w-full max-w-md rounded-lg p-0 shadow-xl backdrop:bg-black/40">
+<dialog id="book-dialog" class="m-auto w-full max-w-md rounded-xl p-0 shadow-xl backdrop:bg-black/50">
     <form method="post" action="admin-books.php" novalidate class="space-y-4 p-6">
-        <h2 id="book-dialog-title" class="text-lg font-semibold text-gray-800">Add book</h2>
+        <h2 id="book-dialog-title" class="text-xl font-bold text-gray-800">Add book</h2>
         <input type="hidden" name="id" id="book-id" value="">
 
         <div>
             <label for="book-title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
             <input type="text" id="book-title" name="title" required
-                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
         </div>
         <div>
             <label for="book-author" class="mb-1 block text-sm font-medium text-gray-700">Author</label>
             <input type="text" id="book-author" name="author" required
-                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
         </div>
         <div>
             <label for="book-genre" class="mb-1 block text-sm font-medium text-gray-700">Genre</label>
             <input type="text" id="book-genre" name="genre" required
-                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
         </div>
         <div>
             <label for="book-copies" class="mb-1 block text-sm font-medium text-gray-700">Total copies</label>
             <input type="number" id="book-copies" name="totalCopies" min="1" value="1" required
-                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                   class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
         </div>
 
         <div class="flex justify-end gap-2 pt-2">
-            <button type="button" id="book-cancel" class="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+            <button type="button" id="book-cancel"
+                    class="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 Cancel
             </button>
-            <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            <button type="submit"
+                    class="rounded bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600">
                 Save book
             </button>
         </div>
@@ -262,6 +312,4 @@ $flash = $resultMessages[$_GET['result'] ?? ''] ?? null;
         }));
     });
 </script>
-
-
 <?php include __DIR__ . '/includes/footer.php'; ?>

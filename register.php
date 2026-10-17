@@ -78,6 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<?php
+$old = $passed ? [] : $_POST;
+function old(array $old, string $key): string
+{
+    return htmlspecialchars($old[$key] ?? '', ENT_QUOTES);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -86,106 +93,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <title>Register | Library System</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     </head>
-    <body class="bg-gray-100 min-h-screen">
-        <main class="mx-auto max-w-md px-4 py-10">
-            <h1 class="mb-6 text-2xl font-semibold text-gray-800">Student Registration</h1>
+    <body class="min-h-screen bg-gray-900">
+        <section class="relative min-h-screen bg-cover bg-center px-4 py-10"
+                style="background-image: url('images/library-home.jpg'); background-attachment: fixed;">
+            <div class="fixed inset-0 bg-black/55"></div>
 
-            <form method="post" action="register.php" novalidate class="space-y-4 rounded-lg bg-white p-6 shadow">
-                
-                <?php if (!empty($errors)): ?>
-                    <div class="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-                        <ul class="list-disc pl-5">
-                            <?php foreach ($errors as $error): ?>
-                                <li><?= htmlspecialchars($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-                <?php if ($passed): ?>
-                    <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">
-                        Registered! You can now <a href="login.php" class="font-medium underline">log in</a>.
-                    </div>
-                <?php endif; ?>
-
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">First name</label>
-                        <input type="text" id="firstName" name="firstName" required
-                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">Last name</label>
-                        <input type="text" id="lastName" name="lastName" required
-                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                    </div>
+            <div class="relative z-10 mx-auto w-full max-w-md">
+                <div class="mb-6 flex flex-col items-center text-center text-white">
+                    <img src="images/pcnl-logo.png" alt="PCNL logo" class="h-16 w-auto">
+                    <h1 class="mt-3 text-2xl font-bold">Student Registration</h1>
+                    <p class="mt-1 text-sm text-gray-300">Create an account to borrow books.</p>
                 </div>
 
-                <div>
-                    <label for="studentId" class="mb-1 block text-sm font-medium text-gray-700">Student ID</label>
-                    <input type="text" id="studentId" name="studentId" required
-                        class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                </div>
+                <form method="post" action="register.php" novalidate class="space-y-4 rounded-xl bg-white p-6 shadow-xl">
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="age" class="mb-1 block text-sm font-medium text-gray-700">Age</label>
-                        <input type="number" id="age" name="age" min="15" max="100" required
-                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    <?php if (!empty($errors)): ?>
+                        <div class="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+                            <ul class="list-disc pl-5">
+                                <?php foreach ($errors as $error): ?>
+                                    <li><?= htmlspecialchars($error) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($passed): ?>
+                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">
+                            Registered! You can now <a href="login.php" class="font-semibold underline">log in</a>.
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">First name</label>
+                            <input type="text" id="firstName" name="firstName" required value="<?= old($old, 'firstName') ?>"
+                                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">Last name</label>
+                            <input type="text" id="lastName" name="lastName" required value="<?= old($old, 'lastName') ?>"
+                                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                        </div>
                     </div>
+
                     <div>
-                        <label for="yearLevel" class="mb-1 block text-sm font-medium text-gray-700">Year level</label>
-                        <select id="yearLevel" name="yearLevel" required
-                                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <label for="studentId" class="mb-1 block text-sm font-medium text-gray-700">Student ID</label>
+                        <input type="text" id="studentId" name="studentId" required value="<?= old($old, 'studentId') ?>"
+                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="age" class="mb-1 block text-sm font-medium text-gray-700">Age</label>
+                            <input type="number" id="age" name="age" min="15" max="100" required value="<?= old($old, 'age') ?>"
+                                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="yearLevel" class="mb-1 block text-sm font-medium text-gray-700">Year level</label>
+                            <select id="yearLevel" name="yearLevel" required
+                                    class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-orange-500 focus:outline-none">
+                                <option value="">Choose...</option>
+                                <?php foreach ([1, 2, 3, 4] as $y): ?>
+                                    <option value="<?= $y ?>" <?= old($old, 'yearLevel') === (string) $y ? 'selected' : '' ?>><?= $y ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="course" class="mb-1 block text-sm font-medium text-gray-700">Course</label>
+                        <select id="course" name="course" required
+                                class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-orange-500 focus:outline-none">
                             <option value="">Choose...</option>
-                            <option>1</option><option>2</option><option>3</option><option>4</option>
+                            <?php foreach ($allowedCourses as $c): ?>
+                                <option value="<?= htmlspecialchars($c) ?>" <?= old($old, 'course') === $c ? 'selected' : '' ?>><?= htmlspecialchars($c) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
-                </div>
 
-                <div>
-                    <label for="course" class="mb-1 block text-sm font-medium text-gray-700">Course</label>
-                    <select id="course" name="course" required
-                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                        <option value="">Choose...</option>
-                        <option>BSIT</option>
-                        <option>BSCE</option>
-                        <option>BSCrim</option>
-                        <option>BSA</option>
-                        <option>BSE</option>
-                        <option>BSBA</option>
-                    </select>
-                </div>
+                    <div>
+                        <label for="username" class="mb-1 block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" id="username" name="username" required autocomplete="username" value="<?= old($old, 'username') ?>"
+                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                    </div>
 
-                <div>
-                    <label for="username" class="mb-1 block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="username" name="username" required
-                        class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                </div>
+                    <div>
+                        <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="new-password"
+                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                    </div>
 
-                <div>
-                    <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="password" name="password" required
-                        class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                </div>
+                    <div>
+                        <label for="confirm" class="mb-1 block text-sm font-medium text-gray-700">Confirm password</label>
+                        <input type="password" id="confirm" name="confirm" required autocomplete="new-password"
+                            class="w-full rounded border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none">
+                    </div>
 
-                <div>
-                    <label for="confirm" class="mb-1 block text-sm font-medium text-gray-700">Confirm password</label>
-                    <input type="password" id="confirm" name="confirm" required
-                        class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
-                </div>
+                    <button type="submit"
+                            class="w-full rounded bg-orange-500 px-4 py-2.5 font-semibold text-white hover:bg-orange-600">
+                        Register
+                    </button>
+                </form>
 
-                <button type="submit"
-                        class="w-full rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700">
-                    Register
-                </button>
-                
-            </form>
-            <p class="mt-4 text-center text-sm text-gray-600">
-                Already registered?
-                <a href="login.php" class="font-medium text-blue-600 hover:underline">Log in</a>
-            </p>
-        </main>
+                <p class="mt-4 text-center text-sm text-gray-200">
+                    Already registered?
+                    <a href="login.php" class="font-semibold text-orange-400 hover:underline">Log in</a>
+                </p>
+            </div>
+        </section>
+
         <script src="js/script.js"></script>
     </body>
 </html>

@@ -8,6 +8,7 @@ $area = 'admin';
 
 $db = getDb();
 
+// Look up students and books once, keyed by id.
 $students = [];
 foreach ($db->selectCollection('users')->find(['role' => 'student']) as $u) {
     $students[(string) $u['_id']] = $u;
@@ -25,24 +26,49 @@ foreach ($db->selectCollection('borrowings')->find([], ['sort' => ['borrowedAt' 
         'student'    => $student ? $student['firstName'] . ' ' . $student['lastName'] : 'Unknown student',
         'studentId'  => $student['studentId'] ?? '—',
         'book'       => $bookTitles[(string) $r['bookId']] ?? 'Deleted book',
-        'borrowedAt' => $r['borrowedAt']->toDateTime()->setTimezone($tz)->format('Y-m-d'),
-        'returnedAt' => $r['returnedAt'] ? $r['returnedAt']->toDateTime()->setTimezone($tz)->format('Y-m-d') : null,
+        'borrowedAt' => $r['borrowedAt']->toDateTime()->setTimezone($tz)->format('M j, Y'),
+        'returnedAt' => $r['returnedAt'] ? $r['returnedAt']->toDateTime()->setTimezone($tz)->format('M j, Y') : null,
         'status'     => $r['status'],
     ];
 }
 
 $activeCount = count(array_filter($borrowings, fn($b) => $b['status'] === 'borrowed'));
+$totalCount = count($borrowings);
+$returnedCount = $totalCount - $activeCount;
 
 include __DIR__ . '/includes/header.php';
 ?>
 
-<div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-gray-800">Borrowings</h1>
-    <p class="text-sm text-gray-600"><?= $activeCount ?> currently borrowed</p>
+<h1 class="mb-6 text-2xl font-bold text-gray-800">Borrowings</h1>
+
+<!-- Summary -->
+<section class="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-orange-500"><?= $activeCount ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Currently borrowed</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-green-600"><?= $returnedCount ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Returned</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+        <p class="text-3xl font-bold text-gray-800"><?= $totalCount ?></p>
+        <p class="mt-1 text-xs text-gray-500 sm:text-sm">Total records</p>
+    </div>
+</section>
+
+<!-- Filter tabs -->
+<div class="mb-4 flex flex-wrap gap-2">
+    <button type="button" data-filter="all"
+            class="rounded-full bg-orange-500 px-4 py-1.5 text-sm font-medium text-white">All</button>
+    <button type="button" data-filter="borrowed"
+            class="rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">Borrowed</button>
+    <button type="button" data-filter="returned"
+            class="rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">Returned</button>
 </div>
 
-<div class="overflow-x-auto rounded-lg bg-white shadow">
-    <table class="w-full text-left text-sm">
+<div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <table class="w-full min-w-[40rem] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-gray-600">
             <tr>
                 <th class="px-4 py-3">Student</th>
@@ -55,21 +81,25 @@ include __DIR__ . '/includes/header.php';
         </thead>
         <tbody>
             <?php foreach ($borrowings as $b): ?>
-                <tr class="border-b border-gray-200 last:border-0">
-                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($b['student']) ?></td>
+                <tr data-status="<?= htmlspecialchars($b['status']) ?>"
+                    class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-800"><?= htmlspecialchars($b['student']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($b['studentId']) ?></td>
                     <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($b['book']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($b['borrowedAt']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= $b['returnedAt'] ? htmlspecialchars($b['returnedAt']) : '—' ?></td>
                     <td class="px-4 py-3">
                         <?php if ($b['status'] === 'borrowed'): ?>
-                            <span class="rounded bg-yellow-50 px-2 py-0.5 text-xs text-yellow-700">Borrowed</span>
+                            <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-700">Borrowed</span>
                         <?php else: ?>
-                            <span class="rounded bg-green-50 px-2 py-0.5 text-xs text-green-700">Returned</span>
+                            <span class="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">Returned</span>
                         <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
+            <tr id="no-records" class="<?= empty($borrowings) ? '' : 'hidden' ?>">
+                <td colspan="6" class="px-4 py-8 text-center text-gray-500">No records to show.</td>
+            </tr>
         </tbody>
     </table>
 </div>
