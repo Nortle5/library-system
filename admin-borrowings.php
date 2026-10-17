@@ -56,9 +56,9 @@ include __DIR__ . '/includes/header.php';
         <tbody>
             <?php foreach ($borrowings as $b): ?>
                 <tr class="border-b border-gray-200 last:border-0">
-                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($students[$b['studentId']] ?? 'Unknown student') ?></td>
+                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($b['student']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($b['studentId']) ?></td>
-                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars(bookTitle($books, $b['bookId'])) ?></td>
+                    <td class="px-4 py-3 text-gray-800"><?= htmlspecialchars($b['book']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= htmlspecialchars($b['borrowedAt']) ?></td>
                     <td class="px-4 py-3 text-gray-600"><?= $b['returnedAt'] ? htmlspecialchars($b['returnedAt']) : '—' ?></td>
                     <td class="px-4 py-3">

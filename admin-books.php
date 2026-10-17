@@ -9,7 +9,8 @@ $area = 'admin';
 $errors = [];
 $booksCol = getDb()->selectCollection('books');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && ($_POST['id'] ?? '') === '') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
+    $bookId = trim($_POST['id'] ?? '');
     $title  = trim($_POST['title']);
     $author = trim($_POST['author'] ?? '');
     $genre  = trim($_POST['genre'] ?? '');
@@ -28,17 +29,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && ($_POST['
         $errors[] = 'Total copies must be a whole number from 1 to 1000.';
     }
 
+    if (empty($errors) && $bookId !== '') {
+        try {
+            $oid = new MongoDB\BSON\ObjectId($bookId);
+            $existing = $booksCol->findOne(['_id' => $oid]);
+        } catch (Throwable $e) {
+            $existing = null;
+        }
+
+        if (!$existing) {
+            $errors[] = 'That book no longer exists.';
+        } else {
+            $borrowedNow = $existing['totalCopies'] - $existing['availableCopies'];
+            if ((int) $copies < $borrowedNow) {
+                $errors[] = "Total copies can't be lower than the $borrowedNow copies currently borrowed.";
+            }
+        }
+    }
+
     if (empty($errors)) {
-        $booksCol->insertOne([
-            'title'           => $title,
-            'author'          => $author,
-            'genre'           => $genre,
-            'totalCopies'     => (int) $copies,
-            'availableCopies' => (int) $copies,
-            'createdAt'       => new MongoDB\BSON\UTCDateTime(),
-        ]);
-        header('Location: admin-books.php?added=1');
-        exit;
+        if ($bookId === '') {
+            $booksCol->insertOne([
+                'title'           => $title,
+                'author'          => $author,
+                'genre'           => $genre,
+                'totalCopies'     => (int) $copies,
+                'availableCopies' => (int) $copies,
+                'createdAt'       => new MongoDB\BSON\UTCDateTime(),
+            ]);
+            header('Location: admin-books.php?added=1');
+            exit;
+        }
+
+        $newTotal = (int) $copies;
+        $borrowedExpr = ['$subtract' => ['$totalCopies', '$availableCopies']];
+
+        $res = $booksCol->updateOne(
+            ['_id' => $oid, '$expr' => ['$lte' => [$borrowedExpr, $newTotal]]],
+            [['$set' => [
+                'title'           => ['$literal' => $title],
+                'author'          => ['$literal' => $author],
+                'genre'           => ['$literal' => $genre],
+                'availableCopies' => ['$subtract' => [$newTotal, $borrowedExpr]],
+                'totalCopies'     => $newTotal,
+            ]]]
+        );
+
+        if ($res->getMatchedCount() === 1) {
+            header('Location: admin-books.php?result=updated');
+            exit;
+        }
+        $errors[] = 'Could not save. A copy may have just been borrowed, so please try again.';
     }
 }
 
@@ -68,6 +109,22 @@ include __DIR__ . '/includes/header.php';
 <?php if (isset($_GET['added'])): ?>
     <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">Book added.</div>
 <?php endif; ?>
+
+<?php
+$resultMessages = [
+    'updated' => ['green', 'Book updated.'],
+    'deleted' => ['green', 'Book deleted.'],
+    'blocked' => ['red',   "That book can't be deleted while copies are borrowed."],
+    'error'   => ['red',   'Something went wrong. Please try again.'],
+];
+$flash = $resultMessages[$_GET['result'] ?? ''] ?? null;
+?>
+<?php if ($flash): ?>
+    <div class="mb-4 rounded border border-<?= $flash[0] ?>-300 bg-<?= $flash[0] ?>-50 p-3 text-sm text-<?= $flash[0] ?>-700">
+        <?= htmlspecialchars($flash[1]) ?>
+    </div>
+<?php endif; ?>
+
 <?php if (!empty($errors)): ?>
     <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
         <ul class="list-disc pl-5">
@@ -124,7 +181,7 @@ include __DIR__ . '/includes/header.php';
                             Edit
                         </button>
 
-                        <form method="post" action="admin-books.php" class="inline">
+                        <form method="post" action="delete-book.php" class="inline" onsubmit="return confirm('Delete this book? This cannot be undone.');">
                             <input type="hidden" name="id" value="<?= htmlspecialchars($book['id']) ?>">
                             <button type="submit" class="text-red-600 hover:underline">Delete</button>
                         </form>
