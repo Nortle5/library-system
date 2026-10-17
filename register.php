@@ -4,7 +4,8 @@ $passed = false;
 $allowedCourses = ['BSIT', 'BSCrim', 'BSA', 'BSE', 'BSCE', 'BSBA']; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name      = trim($_POST['name'] ?? '');
+    $firstName  = trim($_POST['firstName'] ?? '');
+    $lastName   = trim($_POST['lastName'] ?? '');
     $studentId = trim($_POST['studentId'] ?? '');
     $age       = trim($_POST['age'] ?? '');
     $yearLevel = trim($_POST['yearLevel'] ?? '');
@@ -13,8 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password  = $_POST['password'] ?? '';
     $confirm   = $_POST['confirm'] ?? '';
 
-    if (mb_strlen($name) < 2 || mb_strlen($name) > 100) {
-        $errors[] = 'Full name must be 2 to 100 characters.';
+    $namePattern = '/^\p{L}[\p{L} .\'-]*$/u';
+
+    if (mb_strlen($firstName) > 50 || !preg_match($namePattern, $firstName)) {
+        $errors[] = 'First name must be letters only.';
+    }
+    if (mb_strlen($lastName) > 50 || !preg_match($namePattern, $lastName)) {
+        $errors[] = 'Last name must be letters only.';
     }
     if (!preg_match('/^[A-Za-z0-9-]{4,20}$/', $studentId)) {
         $errors[] = 'Student ID must be 4 to 20 letters, numbers, or dashes.';
@@ -39,12 +45,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $passed = true; 
+        require_once __DIR__ . '/includes/db.php';
+
+        try {
+            $users = getDb()->selectCollection('users');
+
+            if ($users->findOne(['username' => $username])) {
+                $errors[] = 'That username is already taken.';
+            }
+            if ($users->findOne(['studentId' => $studentId])) {
+                $errors[] = 'That student ID is already registered.';
+            }
+
+            if (empty($errors)) {
+                $users->insertOne([
+                    'firstName'    => $firstName,
+                    'lastName'     => $lastName,
+                    'studentId'    => $studentId,
+                    'age'          => (int) $age,
+                    'course'       => $course,
+                    'yearLevel'    => (int) $yearLevel,
+                    'username'     => $username,
+                    'passwordHash' => password_hash($password, PASSWORD_DEFAULT),
+                    'role'         => 'student',
+                    'createdAt'    => new MongoDB\BSON\UTCDateTime(),
+                ]);
+                $passed = true;
+            }
+        } catch (Throwable $e) {
+            $errors[] = 'Something went wrong while saving. Please try again.';
+        }
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <?php if ($passed): ?>
             <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">
-                Everything looks valid (not saved yet).
+                Registered! You can now <a href="login.php" class="font-medium underline">log in</a>.
             </div>
         <?php endif; ?>
 

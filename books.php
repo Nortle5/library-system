@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+requireLogin();
+
 $pageTitle = 'Books';
 
 // Sample data for the front end. The database will replace this later.
