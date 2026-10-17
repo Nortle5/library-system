@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/routes.php';
+require_once __DIR__ . '/flash.php';
+require_once __DIR__ . '/icons.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'httponly' => true, 
@@ -15,7 +18,7 @@ function currentUser(): ?array
 function requireLogin(): void
 {
     if (!currentUser()) {
-        header('Location: login.php');
+        header('Location: ' . url('login'));
         exit;
     }
 }
@@ -25,11 +28,11 @@ function requireAdmin(): void
     $user = currentUser();
 
     if (!$user) {
-        header('Location: login.php');
+        header('Location: ' . url('login'));
         exit;
     }
     if ($user['role'] !== 'admin') {
-        header('Location: books.php');
+        header('Location: ' . url('books'));
         exit;
     }
 }

@@ -1,8 +1,8 @@
 <?php
-    require_once __DIR__ . '/includes/auth.php';
+    require_once __DIR__ . '/../includes/auth.php';
     requireLogin();
-    require_once __DIR__ . '/includes/db.php';
-    require_once __DIR__ . '/includes/books.php';
+    require_once __DIR__ . '/../includes/db.php';
+    require_once __DIR__ . '/../includes/books.php';
 
     $pageTitle = 'Books';
 
@@ -15,24 +15,22 @@
         'error'       => ['red',   'Something went wrong. Please try again.'],
     ];
     $flash = $messages[$_GET['result'] ?? ''] ?? null;
+    if ($flash) {
+    toast($flash[0] === 'green' ? 'success' : 'error', $flash[1]);
+    }
 
     $books = searchBooks($q);
 
-    include __DIR__ . '/includes/header.php';
+    include __DIR__ . '/../includes/header.php';
 ?>
-
-<?php if ($flash): ?>
-    <div class="mb-4 rounded border border-<?= $flash[0] ?>-300 bg-<?= $flash[0] ?>-50 p-3 text-sm text-<?= $flash[0] ?>-700">
-        <?= htmlspecialchars($flash[1]) ?>
-    </div>
-<?php endif; ?>
 
 <h1 class="mb-6 text-2xl font-semibold text-gray-800">Browse Books</h1>
 
-<form method="get" action="books.php" class="mb-6 flex gap-2">
-    <input type="text" id="search-input" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search by title, author, or genre"
+<form method="get" action="<?= url('books') ?>" class="mb-6 flex gap-2">
+    <input type="text" id="search-input" data-endpoint="<?= url('search_books') ?>" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search by title, author, or genre"
            class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-orange-500 focus:outline-none">
-    <button type="submit" class="rounded bg-orange-500 px-5 py-2 font-medium text-white hover:bg-orange-600">
+    <button type="submit" class="inline-flex items-center gap-2 rounded bg-orange-500 px-5 py-2 font-medium text-white hover:bg-orange-600">
+        <?= icon('search', 'h-5 w-5') ?>
         Search
     </button>
 </form>
@@ -58,7 +56,7 @@
             </div>
         </dl>
 
-        <form method="post" action="borrow.php" class="mt-6 flex justify-end gap-2">
+        <form method="post" action="<?= url('borrow') ?>" class="mt-6 flex justify-end gap-2">
             <input type="hidden" name="bookId" id="d-id" value="">
             <button type="button" id="d-close" class="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 Close
@@ -102,4 +100,4 @@
     document.getElementById('d-close').addEventListener('click', () => detailsDialog.close());
 </script>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

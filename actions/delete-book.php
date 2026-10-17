@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 requireAdmin();
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id'])) {
-    header('Location: admin-books.php');
+    header('Location: ' . url('admin_books'));
     exit;
 }
 
@@ -26,5 +26,5 @@ try {
     $result = 'error';
 }
 
-header('Location: admin-books.php?result=' . $result);
+header('Location: ' . url('admin_books') . '?result=' . $result);
 exit;

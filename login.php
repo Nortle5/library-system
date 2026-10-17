@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 
 if (currentUser()) {
-    header('Location: home.php');
+    header('Location: ' . url('home'));
     exit;
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'firstName' => $user['firstName'] ?? $user['username'],
                     'role'      => $user['role'],
                 ];
-                header('Location: home.php');
+                header('Location: ' . url('home'));
                 exit;
             }
 
@@ -49,17 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </head>
     <body class="min-h-screen bg-gray-900">
         <section class="relative flex min-h-screen items-center justify-center bg-cover bg-center px-4 py-10"
-                style="background-image: url('images/library-home.jpg');">
+                style="background-image: url('<?= asset('images/library-home.jpg') ?>');">
             <div class="absolute inset-0 bg-black/55"></div>
 
             <div class="relative z-10 w-full max-w-sm">
                 <div class="mb-6 flex flex-col items-center text-center text-white">
-                    <img src="images/pcnl-logo.png" alt="PCNL logo" class="h-16 w-auto">
+                    <img src="<?= asset('images/pcnl-logo.png') ?>" alt="PCNL logo" class="h-16 w-auto">
                     <h1 class="mt-3 text-2xl font-bold">PCNL Library System</h1>
                     <p class="mt-1 text-sm text-gray-300">Log in to search and borrow books.</p>
                 </div>
 
-                <form method="post" action="login.php" novalidate class="space-y-4 rounded-xl bg-white p-6 shadow-xl">
+                <form method="post" action="<?= url('login') ?>" novalidate class="space-y-4 rounded-xl bg-white p-6 shadow-xl">
                     <?php if ($error !== ''): ?>
                         <div class="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
                             <?= htmlspecialchars($error) ?>
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <p class="mt-4 text-center text-sm text-gray-200">
                     No account yet?
-                    <a href="register.php" class="font-semibold text-orange-400 hover:underline">Register here</a>
+                    <a href="<?= url('register') ?>" class="font-semibold text-orange-400 hover:underline">Register here</a>
                 </p>
             </div>
         </section>

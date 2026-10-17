@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-require_once __DIR__ . '/includes/books.php';
+require_once __DIR__ . '/../includes/books.php';
 
 $q = mb_substr(trim($_GET['q'] ?? ''), 0, 100);
 

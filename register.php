@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/includes/routes.php';
 $errors = [];
 $passed = false;
 $allowedCourses = ['BSIT', 'BSCrim', 'BSA', 'BSE', 'BSCE', 'BSBA']; 
@@ -95,17 +96,17 @@ function old(array $old, string $key): string
     </head>
     <body class="min-h-screen bg-gray-900">
         <section class="relative min-h-screen bg-cover bg-center px-4 py-10"
-                style="background-image: url('images/library-home.jpg'); background-attachment: fixed;">
+                style="background-image: url('<?= asset('images/library-home.jpg') ?>'); background-attachment: fixed;">
             <div class="fixed inset-0 bg-black/55"></div>
 
             <div class="relative z-10 mx-auto w-full max-w-md">
                 <div class="mb-6 flex flex-col items-center text-center text-white">
-                    <img src="images/pcnl-logo.png" alt="PCNL logo" class="h-16 w-auto">
+                    <img src="<?= asset('images/pcnl-logo.png') ?>" alt="PCNL logo" class="h-16 w-auto">
                     <h1 class="mt-3 text-2xl font-bold">Student Registration</h1>
                     <p class="mt-1 text-sm text-gray-300">Create an account to borrow books.</p>
                 </div>
 
-                <form method="post" action="register.php" novalidate class="space-y-4 rounded-xl bg-white p-6 shadow-xl">
+                <form method="post" action="<?= url('register') ?>" novalidate class="space-y-4 rounded-xl bg-white p-6 shadow-xl">
 
                     <?php if (!empty($errors)): ?>
                         <div class="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
@@ -118,7 +119,7 @@ function old(array $old, string $key): string
                     <?php endif; ?>
                     <?php if ($passed): ?>
                         <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-700">
-                            Registered! You can now <a href="login.php" class="font-semibold underline">log in</a>.
+                            Registered! You can now <a href="<?= url('login') ?>" class="font-semibold underline">log in</a>.
                         </div>
                     <?php endif; ?>
 
@@ -196,11 +197,11 @@ function old(array $old, string $key): string
 
                 <p class="mt-4 text-center text-sm text-gray-200">
                     Already registered?
-                    <a href="login.php" class="font-semibold text-orange-400 hover:underline">Log in</a>
+                    <a href="<?= url('login') ?>" class="font-semibold text-orange-400 hover:underline">Log in</a>
                 </p>
             </div>
         </section>
 
-        <script src="js/script.js"></script>
+        <script src="<?= asset('js/script.js') ?>"></script>
     </body>
 </html>

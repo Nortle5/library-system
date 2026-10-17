@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 requireAdmin();
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 $pageTitle = 'Borrowings';
 $area = 'admin';
 
 $db = getDb();
 
-// Look up students and books once, keyed by id.
 $students = [];
 foreach ($db->selectCollection('users')->find(['role' => 'student']) as $u) {
     $students[(string) $u['_id']] = $u;
@@ -36,7 +35,7 @@ $activeCount = count(array_filter($borrowings, fn($b) => $b['status'] === 'borro
 $totalCount = count($borrowings);
 $returnedCount = $totalCount - $activeCount;
 
-include __DIR__ . '/includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <h1 class="mb-6 text-2xl font-bold text-gray-800">Borrowings</h1>
@@ -104,4 +103,4 @@ include __DIR__ . '/includes/header.php';
     </table>
 </div>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

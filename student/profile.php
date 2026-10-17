@@ -1,11 +1,11 @@
 <?php
-    require_once __DIR__ . '/includes/auth.php';
+    require_once __DIR__ . '/../includes/auth.php';
     requireLogin();
-    require_once __DIR__ . '/includes/db.php';
+    require_once __DIR__ . '/../includes/db.php';
 
     $sessionUser = currentUser();
     if ($sessionUser['role'] !== 'student') {
-        header('Location: admin-books.php');
+        header('Location: ' . url('admin_books'));
         exit;
     }
 
@@ -15,7 +15,7 @@
 
     $student = $db->selectCollection('users')->findOne(['_id' => $userId]);
     if (!$student) {
-        header('Location: logout.php');
+        header('Location: ' . url('logout'));
         exit;
     }
 
@@ -62,15 +62,12 @@
         'error'    => ['red',   'Something went wrong. Please try again.'],
     ];
     $flash = $messages[$_GET['result'] ?? ''] ?? null;
+    if ($flash) {
+    toast($flash[0] === 'green' ? 'success' : 'error', $flash[1]);
+    }
 
-    include __DIR__ . '/includes/header.php';
+    include __DIR__ . '/../includes/header.php';
 ?>
-
-<?php if ($flash): ?>
-    <div class="mb-4 rounded border border-<?= $flash[0] ?>-300 bg-<?= $flash[0] ?>-50 p-3 text-sm text-<?= $flash[0] ?>-700">
-        <?= htmlspecialchars($flash[1]) ?>
-    </div>
-<?php endif; ?>
 
     <!-- Banner -->
 <section class="flex flex-col items-center gap-5 rounded-2xl bg-gray-900 p-6 text-center text-white shadow sm:flex-row sm:p-8 sm:text-left">
@@ -118,7 +115,8 @@
     <?php if (empty($current)): ?>
         <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
             <p class="text-gray-600">You have no borrowed books right now.</p>
-            <a href="books.php" class="mt-4 inline-block rounded bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600">
+            <a href="<?= url('books') ?>" cclass="mt-4 inline-flex items-center gap-2 rounded bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600">
+                <?= icon('book-open', 'h-4 w-4') ?>
                 Browse books
             </a>
         </div>
@@ -132,9 +130,10 @@
                             Borrowed <?= htmlspecialchars($b['daysAgo']) ?> &middot; <?= htmlspecialchars($b['borrowedAt']) ?>
                         </p>
                     </div>
-                    <form method="post" action="return.php" class="mt-4" onsubmit="return confirm('Return this book?');">
+                    <form method="post" action="<?= url('return') ?>" class="mt-4" onsubmit="return confirm('Return this book?');">
                         <input type="hidden" name="borrowingId" value="<?= htmlspecialchars($b['id']) ?>">
-                        <button type="submit" class="w-full rounded bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600">
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600">
+                            <?= icon('return', 'h-4 w-4') ?>
                             Return book
                         </button>
                     </form>
@@ -180,4 +179,4 @@
         </div>
     </section>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

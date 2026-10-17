@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-require_once __DIR__ . '/includes/borrowings.php';
+require_once __DIR__ . '/../includes/borrowings.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['bookId'])) {
-    header('Location: books.php');
+    header('Location: ' . url('books'));
     exit;
 }
 
@@ -13,5 +13,5 @@ $result = $user['role'] === 'student'
     ? borrowBook($user['id'], (string) $_POST['bookId'])
     : 'notstudent';
 
-header('Location: books.php?result=' . $result);
+header('Location: ' . url('books') . '?result=' . $result);
 exit;
