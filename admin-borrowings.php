@@ -1,35 +1,34 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 requireAdmin();
+require_once __DIR__ . '/includes/db.php';
 
 $pageTitle = 'Borrowings';
 $area = 'admin';
 
-$books = require __DIR__ . '/includes/sample_books.php';
+$db = getDb();
 
-// Sample data for the front end. The database will replace this later.
-$students = [
-    '2023-00123' => 'Juan Dela Cruz',
-    '2023-00456' => 'Maria Santos',
-    '2022-00789' => 'Pedro Reyes',
-];
+$students = [];
+foreach ($db->selectCollection('users')->find(['role' => 'student']) as $u) {
+    $students[(string) $u['_id']] = $u;
+}
+$bookTitles = [];
+foreach ($db->selectCollection('books')->find() as $b) {
+    $bookTitles[(string) $b['_id']] = $b['title'];
+}
 
-$borrowings = [
-    ['studentId' => '2023-00123', 'bookId' => 1, 'borrowedAt' => '2026-10-05', 'returnedAt' => null,         'status' => 'borrowed'],
-    ['studentId' => '2023-00123', 'bookId' => 4, 'borrowedAt' => '2026-10-07', 'returnedAt' => null,         'status' => 'borrowed'],
-    ['studentId' => '2023-00456', 'bookId' => 3, 'borrowedAt' => '2026-10-02', 'returnedAt' => null,         'status' => 'borrowed'],
-    ['studentId' => '2022-00789', 'bookId' => 2, 'borrowedAt' => '2026-09-12', 'returnedAt' => '2026-09-19', 'status' => 'returned'],
-    ['studentId' => '2023-00456', 'bookId' => 5, 'borrowedAt' => '2026-09-01', 'returnedAt' => '2026-09-08', 'status' => 'returned'],
-];
-
-function bookTitle(array $books, int $bookId): string
-{
-    foreach ($books as $book) {
-        if ($book['id'] === $bookId) {
-            return $book['title'];
-        }
-    }
-    return 'Unknown book';
+$tz = new DateTimeZone('Asia/Manila');
+$borrowings = [];
+foreach ($db->selectCollection('borrowings')->find([], ['sort' => ['borrowedAt' => -1]]) as $r) {
+    $student = $students[(string) $r['userId']] ?? null;
+    $borrowings[] = [
+        'student'    => $student ? $student['firstName'] . ' ' . $student['lastName'] : 'Unknown student',
+        'studentId'  => $student['studentId'] ?? '—',
+        'book'       => $bookTitles[(string) $r['bookId']] ?? 'Deleted book',
+        'borrowedAt' => $r['borrowedAt']->toDateTime()->setTimezone($tz)->format('Y-m-d'),
+        'returnedAt' => $r['returnedAt'] ? $r['returnedAt']->toDateTime()->setTimezone($tz)->format('Y-m-d') : null,
+        'status'     => $r['status'],
+    ];
 }
 
 $activeCount = count(array_filter($borrowings, fn($b) => $b['status'] === 'borrowed'));
