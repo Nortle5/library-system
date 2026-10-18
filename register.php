@@ -74,7 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $passed = true;
             }
         } catch (Throwable $e) {
-            $errors[] = 'Something went wrong while saving. Please try again.';
+            if ($e->getCode() === 11000 || str_contains($e->getMessage(), 'E11000')) {
+                $errors[] = str_contains($e->getMessage(), 'index: studentId_1')
+                    ? 'That student ID is already registered.'
+                    : 'That username is already taken.';
+            } else {
+                $errors[] = 'Something went wrong while saving. Please try again.';
+            }
         }
     }
 }

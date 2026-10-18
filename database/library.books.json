@@ -1,0 +1,203 @@
+[{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05211"
+  },
+  "title": "El Filibusterismo",
+  "author": "José Rizal",
+  "genre": "Filipino Literature",
+  "totalCopies": 3,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05212"
+  },
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05213"
+  },
+  "title": "Computer Networking: A Top-Down Approach",
+  "author": "James F. Kurose, Keith W. Ross",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05214"
+  },
+  "title": "Introduction to Algorithms",
+  "author": "Thomas H. Cormen, Charles E. Leiserson",
+  "genre": "Technology",
+  "totalCopies": 1,
+  "availableCopies": 1
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05215"
+  },
+  "title": "The Pragmatic Programmer",
+  "author": "Andrew Hunt, David Thomas",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05216"
+  },
+  "title": "Database System Concepts",
+  "author": "Abraham Silberschatz, Henry F. Korth",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05217"
+  },
+  "title": "Operating System Concepts",
+  "author": "Abraham Silberschatz, Peter B. Galvin",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05218"
+  },
+  "title": "Don't Make Me Think",
+  "author": "Steve Krug",
+  "genre": "Technology",
+  "totalCopies": 1,
+  "availableCopies": 1
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05219"
+  },
+  "title": "JavaScript: The Good Parts",
+  "author": "Douglas Crockford",
+  "genre": "Technology",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521a"
+  },
+  "title": "HTML and CSS: Design and Build Websites",
+  "author": "Jon Duckett",
+  "genre": "Technology",
+  "totalCopies": 3,
+  "availableCopies": 3
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521b"
+  },
+  "title": "The Hobbit",
+  "author": "J.R.R. Tolkien",
+  "genre": "Fantasy",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521c"
+  },
+  "title": "Harry Potter and the Sorcerer's Stone",
+  "author": "J.K. Rowling",
+  "genre": "Fantasy",
+  "totalCopies": 3,
+  "availableCopies": 3
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521d"
+  },
+  "title": "1985",
+  "author": "George Orwell",
+  "genre": "Dystopian Fiction",
+  "totalCopies": 2,
+  "availableCopies": 1
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521e"
+  },
+  "title": "To Kill a Mockingbird",
+  "author": "Harper Lee",
+  "genre": "Classic",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd0521f"
+  },
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "genre": "Classic",
+  "totalCopies": 1,
+  "availableCopies": 1
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05220"
+  },
+  "title": "Pride and Prejudice",
+  "author": "Jane Austen",
+  "genre": "Romance",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05221"
+  },
+  "title": "A Brief History of Time",
+  "author": "Stephen Hawking",
+  "genre": "Science",
+  "totalCopies": 1,
+  "availableCopies": 0
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05222"
+  },
+  "title": "Sapiens: A Brief History of Humankind",
+  "author": "Yuval Noah Harari",
+  "genre": "History",
+  "totalCopies": 2,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6aca03f4fc526f0f4dd05223"
+  },
+  "title": "Atomic Habits",
+  "author": "James Clear",
+  "genre": "Self-Help",
+  "totalCopies": 3,
+  "availableCopies": 2
+},
+{
+  "_id": {
+    "$oid": "6accb7aa1664c482ff061014"
+  },
+  "title": "The Wizard of Earthsea",
+  "author": "Ursula Le Guin",
+  "genre": "Fantasy",
+  "totalCopies": 1,
+  "availableCopies": 1,
+  "createdAt": {
+    "$date": "2026-10-12T10:34:18.686Z"
+  }
+}]

@@ -1,0 +1,47 @@
+[{
+  "_id": {
+    "$oid": "6ac77726c8508d11de07b2a2"
+  },
+  "firstName": "Juan",
+  "lastName": "Dela Paz",
+  "studentId": "123456",
+  "age": 21,
+  "course": "BSIT",
+  "yearLevel": 4,
+  "username": "whoisrizal",
+  "passwordHash": "$2y$10$VuP6IXT.4ONTX/4Xww3PzO9RBc0XsAJkh/R36fGuEZQaZOgeVjoh2",
+  "role": "student",
+  "createdAt": {
+    "$date": "2026-10-08T10:57:42.423Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6ac80bb3670ae78e6803bef2"
+  },
+  "firstName": "Library",
+  "lastName": "Admin",
+  "username": "admin",
+  "passwordHash": "$2y$10$GDOvL0oQG7xMQDzhZfFMieGzrHYzSj/2ZL/eDxaUnYERx2S46PukK",
+  "role": "admin",
+  "createdAt": {
+    "$date": "2026-10-08T21:31:31.935Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6accc633fb0a00d8f50de6c2"
+  },
+  "firstName": "Jose",
+  "lastName": "Rizal",
+  "studentId": "234567",
+  "age": 20,
+  "course": "BSIT",
+  "yearLevel": 2,
+  "username": "izmejrizz",
+  "passwordHash": "$2y$10$/Zy0qg94z3xBPcGP1adS0enZBqBWLZen7ekv/LBYA4rnV8D8LZsQe",
+  "role": "student",
+  "createdAt": {
+    "$date": "2026-10-12T11:36:19.772Z"
+  }
+}]
